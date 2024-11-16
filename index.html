@@ -98,6 +98,13 @@
             requestAnimationFrame(draw); // Рисуем снова
         }
 
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceOrientationEvent !== "undefined") {
+  window.addEventListener('devicemotion', function(event) {
+    console.log('Device motion detected:', event);
+  });
+}
+
+
         draw();
     </script>
 </body>
