@@ -3,190 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gyroscope Ball Game</title>
+    <title>Ball in Maze</title>
     <style>
         body {
-            display: flex;
-    flex-direction: column;
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
+            background-color: #f0f0f0;
         }
-        #gameCanvas {
-            background-color: #87ceeb;
+        canvas {
             border: 2px solid #333;
         }
-        #buttonContainer {
-    margin: 0 auto;
-    text-align: center;
-    width: 100%;
-}
-
-#startButton {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #FF5733;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 0 4px #87ceeb;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-#startButton:hover {
-    background-color: #87ceeb;
-}
-
-#startButton:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px #87ceeb;
-}
+        #startButton {
+            position: absolute;
+            top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div id="buttonContainer">
     <button id="startButton">Start Game</button>
-</div>
-    
     <canvas id="gameCanvas" width="500" height="500"></canvas>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-       const ballRadius = 20;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const ballRadius = 20;
         const ballSpeed = 4;
         let ballX = 40, ballY = 40;
         let tiltX = 0, tiltY = 0;
 
-        // Maze walls
+        // Maze walls (coordinates: x, y, width, height)
         const walls = [
-            {x: 0, y: 0, width: 500, height: 20},  // Top wall
-            {x: 0, y: 0, width: 20, height: 500},  // Left wall
-            {x: 480, y: 0, width: 20, height: 500}, // Right wall
-            {x: 0, y: 480, width: 500, height: 20}, // Bottom wall
-            {x: 100, y: 100, width: 20, height: 300}, // Vertical wall
-            {x: 100, y: 100, width: 300, height: 20}, // Horizontal wall
-        ];
-
-        // Начальные значения для гироскопа
-        let tiltX = 0;
-        let tiltY = 0;
-
-        // Функция для рисования квадрата
-        function drawSquare() {
-            ctx.beginPath();
-            ctx.rect((canvas.width - squareSize) / 2, (canvas.height - squareSize) / 2, squareSize, squareSize);
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.closePath();
-        }
-
-         // Draw the maze walls
-        function drawWalls() {
-            ctx.fillStyle = "#000";
-            walls.forEach(wall => {
-                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
-            });
-        }
-        
-        // Функция для рисования мячика
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "#FF5733";
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        // Функция для движения мячика с использованием гироскопа
-        function moveBall() {
-            let newBallX = ballX + tiltX * ballSpeed;
-            let newBallY = ballY - tiltY * ballSpeed;
-
-            // Check for collisions
-            for (let wall of walls) {
-                if (
-                    newBallX + ballRadius > wall.x &&
-                    newBallX - ballRadius < wall.x + wall.width &&
-                    newBallY + ballRadius > wall.y &&
-                    newBallY - ballRadius < wall.y + wall.height
-                ) {
-                    return; // Don't move the ball if there's a collision
-                }
-            }
-
-            ballX = newBallX;
-            ballY = newBallY;
-        }
-function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-            drawWalls(); // Draw walls
-            drawBall(); // Draw ball
-            moveBall(); // Move ball
-            requestAnimationFrame(draw); // Keep drawing
-        }
-
-        // Обработчик для данных гироскопа
-        function handleGyroscope(event) {
-            tiltX = event.gamma / 30; // Разделим для корректировки чувствительности
-            tiltY = -event.beta / 30; // Разделим для корректировки чувствительности
-        }
-
-        // Слушаем события гироскопа
-        window.addEventListener('deviceorientation', handleGyroscope, false);
-
-        document.getElementById('startButton').addEventListener('click', () => {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-            .then(response => {
-                if (response === 'granted') {
-                    window.addEventListener('deviceorientation', handleGyroscope, false);
-                } else {
-                    alert('Permission denied for accessing motion sensors.');
-                }
-            })
-            .catch(console.error);
-    } else {
-        window.addEventListener('deviceorientation', handleGyroscope, false);
-    }
-});
-
-        
-if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission()
-                .then(response => {
-                    if (response === 'granted') {
-                        window.addEventListener('deviceorientation', handleGyroscope, false);
-                    } else {
-                        alert('Permission denied for accessing motion sensors.');
-                    }
-                })
-                .catch(console.error);
-        } else {
-            // Для устройств, которые не требуют разрешения
-            window.addEventListener('deviceorientation', handleGyroscope, false);
-        }
-
-        
-        // Главная функция для рисования и обновления экрана
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем экран
-            drawSquare(); // Рисуем квадрат
-            drawBall(); // Рисуем мячик
-            moveBall(); // Двигаем мячик
-            requestAnimationFrame(draw); // Рисуем снова
-        }
-
-        draw();
-    </script>
-</body>
-</html>
+            {x: 0, y: 0, width: 500, height: 2
