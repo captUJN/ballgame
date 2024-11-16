@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyroscope Ball Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #gameCanvas {
+            background-color: #87ceeb;
+            border: 2px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const ballRadius = 20;
+        const squareSize = 400;
+        let ballX = squareSize / 2;
+        let ballY = squareSize / 2;
+        let ballSpeed = 4;
+
+        // Начальные значения для гироскопа
+        let tiltX = 0;
+        let tiltY = 0;
+
+        // Функция для рисования квадрата
+        function drawSquare() {
+            ctx.beginPath();
+            ctx.rect((canvas.width - squareSize) / 2, (canvas.height - squareSize) / 2, squareSize, squareSize);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        // Функция для рисования мячика
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#FF5733";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Функция для движения мячика с использованием гироскопа
+        function moveBall() {
+            ballX += tiltX * ballSpeed;
+            ballY -= tiltY * ballSpeed; // Наклон вдоль оси Y
+
+            // Ограничиваем движение мячика в пределах квадрата
+            const squareLeft = (canvas.width - squareSize) / 2;
+            const squareTop = (canvas.height - squareSize) / 2;
+
+            if (ballX - ballRadius < squareLeft) {
+                ballX = squareLeft + ballRadius;
+            } else if (ballX + ballRadius > squareLeft + squareSize) {
+                ballX = squareLeft + squareSize - ballRadius;
+            }
+
+            if (ballY - ballRadius < squareTop) {
+                ballY = squareTop + ballRadius;
+            } else if (ballY + ballRadius > squareTop + squareSize) {
+                ballY = squareTop + squareSize - ballRadius;
+            }
+        }
+
+        // Обработчик для данных гироскопа
+        function handleGyroscope(event) {
+            tiltX = event.gamma / 30; // Разделим для корректировки чувствительности
+            tiltY = event.beta / 30; // Разделим для корректировки чувствительности
+        }
+
+        // Слушаем события гироскопа
+        window.addEventListener('deviceorientation', handleGyroscope, false);
+
+        // Главная функция для рисования и обновления экрана
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем экран
+            drawSquare(); // Рисуем квадрат
+            drawBall(); // Рисуем мячик
+            moveBall(); // Двигаем мячик
+            requestAnimationFrame(draw); // Рисуем снова
+        }
+
+        draw();
+    </script>
+</body>
+</html>
