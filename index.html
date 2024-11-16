@@ -98,13 +98,7 @@
             requestAnimationFrame(draw); // Рисуем снова
         }
 
-        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceOrientationEvent !== "undefined") {
-  window.addEventListener('devicemotion', function(event) {
-    console.log('Device motion detected:', event);
-  });
-}
-
-        <div class="p-3 mb-2 bg-secondary" id="demo-div">
+         <div class="p-3 mb-2 bg-secondary" id="demo-div">
 <a id="start_demo" class="btn btn-lg py-1 btn-success" href="#" role="button">Start demo</a>
 <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning" id="num-observed-events">2</span></p>
 
@@ -140,6 +134,14 @@
 </ul>
 
 </div>
+
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceOrientationEvent !== "undefined") {
+  window.addEventListener('devicemotion', function(event) {
+    console.log('Device motion detected:', event);
+  });
+}
+
+       
 
         draw();
     </script>
