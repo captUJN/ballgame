@@ -27,7 +27,6 @@
             text-align: center;
             width: 100%;
         }
-
         #startButton {
             padding: 10px 20px;
             font-size: 16px;
@@ -39,11 +38,9 @@
             box-shadow: 0 4px #87ceeb;
             transition: background-color 0.3s, transform 0.3s;
         }
-
         #startButton:hover {
             background-color: #87ceeb;
         }
-
         #startButton:active {
             transform: translateY(2px);
             box-shadow: 0 2px #87ceeb;
@@ -54,15 +51,19 @@
     <div id="buttonContainer">
         <button id="startButton">Start Game</button>
     </div>
-    
+
     <canvas id="gameCanvas" width="500" height="500"></canvas>
-    
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
         const ballRadius = 20;
         const squareSize = 400;
+        const columns = [
+            {x: 100, y: 100, width: 50, height: 200},
+            {x: 300, y: 150, width: 50, height: 200}
+        ];
         let ballX = squareSize / 2;
         let ballY = squareSize / 2;
         let ballSpeed = 4;
@@ -71,18 +72,11 @@
         let tiltX = 0;
         let tiltY = 0;
 
-        // Колонны
-        const columns = [
-            { x: 150, y: 100, width: 20, height: 100 },
-            { x: 250, y: 200, width: 20, height: 100 },
-            { x: 350, y: 300, width: 20, height: 100 }
-        ];
-
         // Функция для рисования квадрата
         function drawSquare() {
             ctx.beginPath();
             ctx.rect((canvas.width - squareSize) / 2, (canvas.height - squareSize) / 2, squareSize, squareSize);
-            ctx.strokeStyle = '#333';
+            ctx.strokeStyle = '#000000';
             ctx.lineWidth = 2;
             ctx.stroke();
             ctx.closePath();
@@ -100,8 +94,11 @@
         // Функция для рисования колонн
         function drawColumns() {
             columns.forEach(col => {
+                ctx.beginPath();
+                ctx.rect(col.x, col.y, col.width, col.height);
                 ctx.fillStyle = "#000000";
-                ctx.fillRect(col.x, col.y, col.width, col.height);
+                ctx.fill();
+                ctx.closePath();
             });
         }
 
@@ -128,19 +125,31 @@
 
             // Проверка на столкновение с колоннами
             columns.forEach(col => {
-                if (ballX + ballRadius > col.x && ballX - ballRadius < col.x + col.width &&
-                    ballY + ballRadius > col.y && ballY - ballRadius < col.y + col.height) {
-                    // Останавливаем мячик, если столкновение с колонной
+                const colRight = col.x + col.width;
+                const colBottom = col.y + col.height;
+
+                // Столкновение с колонной
+                if (ballX + ballRadius > col.x && ballX - ballRadius < colRight &&
+                    ballY + ballRadius > col.y && ballY - ballRadius < colBottom) {
+
+                    // Если мячик находится в углу
+                    if (ballX + ballRadius > col.x && ballX - ballRadius < colRight && 
+                        ballY + ballRadius > col.y && ballY - ballRadius < colBottom) {
+                        // Плавное уменьшение скорости или замедление мяча
+                        ballX -= tiltX * ballSpeed * 0.2;
+                        ballY -= tiltY * ballSpeed * 0.2;
+                    }
+                    // Прочие столкновения с колонной
                     if (ballX < col.x) {
                         ballX = col.x - ballRadius; // Столкновение с левой стороной колонны
-                    } else if (ballX > col.x + col.width) {
-                        ballX = col.x + col.width + ballRadius; // Столкновение с правой стороной колонны
+                    } else if (ballX > colRight) {
+                        ballX = colRight + ballRadius; // Столкновение с правой стороной колонны
                     }
 
                     if (ballY < col.y) {
                         ballY = col.y - ballRadius; // Столкновение с верхней стороной колонны
-                    } else if (ballY > col.y + col.height) {
-                        ballY = col.y + col.height + ballRadius; // Столкновение с нижней стороной колонны
+                    } else if (ballY > colBottom) {
+                        ballY = colBottom + ballRadius; // Столкновение с нижней стороной колонны
                     }
                 }
             });
