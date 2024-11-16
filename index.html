@@ -23,6 +23,8 @@
     </style>
 </head>
 <body>
+    <button id="startButton">Start Game</button>
+    
     <canvas id="gameCanvas" width="500" height="500"></canvas>
 
     <script>
@@ -89,6 +91,23 @@
         // Слушаем события гироскопа
         window.addEventListener('deviceorientation', handleGyroscope, false);
 
+        document.getElementById('startButton').addEventListener('click', () => {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+            .then(response => {
+                if (response === 'granted') {
+                    window.addEventListener('deviceorientation', handleGyroscope, false);
+                } else {
+                    alert('Permission denied for accessing motion sensors.');
+                }
+            })
+            .catch(console.error);
+    } else {
+        window.addEventListener('deviceorientation', handleGyroscope, false);
+    }
+});
+
+        
 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             DeviceOrientationEvent.requestPermission()
                 .then(response => {
