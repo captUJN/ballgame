@@ -54,8 +54,9 @@
     <div id="buttonContainer">
         <button id="startButton">Start Game</button>
     </div>
+    
     <canvas id="gameCanvas" width="500" height="500"></canvas>
-
+    
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
@@ -66,14 +67,15 @@
         let ballY = squareSize / 2;
         let ballSpeed = 4;
 
+        // Начальные значения для гироскопа
         let tiltX = 0;
         let tiltY = 0;
 
         // Колонны
         const columns = [
-            { x: 100, y: 100, width: 50, height: 200 },
-            { x: 250, y: 50, width: 50, height: 250 },
-            { x: 350, y: 150, width: 50, height: 150 }
+            { x: 150, y: 100, width: 20, height: 100 },
+            { x: 250, y: 200, width: 20, height: 100 },
+            { x: 350, y: 300, width: 20, height: 100 }
         ];
 
         // Функция для рисования квадрата
@@ -97,8 +99,8 @@
 
         // Функция для рисования колонн
         function drawColumns() {
-            ctx.fillStyle = "#000000"; // Цвет колонн
             columns.forEach(col => {
+                ctx.fillStyle = "#000000";
                 ctx.fillRect(col.x, col.y, col.width, col.height);
             });
         }
@@ -128,8 +130,18 @@
             columns.forEach(col => {
                 if (ballX + ballRadius > col.x && ballX - ballRadius < col.x + col.width &&
                     ballY + ballRadius > col.y && ballY - ballRadius < col.y + col.height) {
-                    // Если столкновение, сбиваем мячик (например, останавливаем движение)
-                    ballX = col.x - ballRadius; // Останавливаем мячик у колонны
+                    // Останавливаем мячик, если столкновение с колонной
+                    if (ballX < col.x) {
+                        ballX = col.x - ballRadius; // Столкновение с левой стороной колонны
+                    } else if (ballX > col.x + col.width) {
+                        ballX = col.x + col.width + ballRadius; // Столкновение с правой стороной колонны
+                    }
+
+                    if (ballY < col.y) {
+                        ballY = col.y - ballRadius; // Столкновение с верхней стороной колонны
+                    } else if (ballY > col.y + col.height) {
+                        ballY = col.y + col.height + ballRadius; // Столкновение с нижней стороной колонны
+                    }
                 }
             });
         }
