@@ -99,11 +99,41 @@
         }
 
 
-       if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceOrientationEvent !== "undefined") {
-  window.addEventListener('devicemotion', function(event) {
-    console.log('Device motion detected:', event);
-  });
+       // Check if the browser supports Device Motion and Orientation events
+if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceOrientationEvent !== 'undefined') {
+  // Check if the device is running on iOS 13+ where permissions are needed
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    // Request permission to access device motion and orientation
+    DeviceMotionEvent.requestPermission()
+      .then(response => {
+        if (response === 'granted') {
+          // Permission granted, add event listeners for device motion and orientation
+          window.addEventListener('devicemotion', event => {
+            console.log("Device Motion detected:", event);
+          });
+
+          window.addEventListener('deviceorientation', event => {
+            console.log("Device Orientation detected:", event);
+          });
+        } else {
+          alert('Permission denied for accessing motion sensors.');
+        }
+      })
+      .catch(console.error);
+  } else {
+    // For older iOS versions or devices that do not require permission
+    window.addEventListener('devicemotion', event => {
+      console.log("Device Motion detected:", event);
+    });
+
+    window.addEventListener('deviceorientation', event => {
+      console.log("Device Orientation detected:", event);
+    });
+  }
+} else {
+  alert('Device motion and orientation are not supported on this device.');
 }
+
 
         draw();
     </script>
