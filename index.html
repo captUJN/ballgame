@@ -2,140 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gyroscope Ball Game</title>
+    <title>Ball Game with Gyroscope</title>
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
-            overflow: hidden;
+            margin: 0;
+            background-color: #f0f0f0;
         }
-        #gameCanvas {
-            background-color: #87ceeb;
-            border: 2px solid #333;
+        #gameContainer {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background-color: #fff;
+            border: 3px solid #000;
+            margin-bottom: 20px;
+        }
+        #ball {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            border-radius: 50%;
+        }
+        #gyroValues {
+            font-size: 16px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <div id="gameContainer">
+        <div id="ball"></div>
+    </div>
+    <div id="gyroValues">
+        <p>Alpha: <span id="alpha">0</span></p>
+        <p>Beta: <span id="beta">0</span></p>
+        <p>Gamma: <span id="gamma">0</span></p>
+    </div>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+        const ball = document.getElementById('ball');
+        const container = document.getElementById('gameContainer');
+        const alphaDisplay = document.getElementById('alpha');
+        const betaDisplay = document.getElementById('beta');
+        const gammaDisplay = document.getElementById('gamma');
 
-        const ballRadius = 20;
-        const squareSize = 400;
-        let ballX = squareSize / 2;
-        let ballY = squareSize / 2;
-        let ballSpeed = 4;
+        let x = 135; // Initial x-position of the ball
+        let y = 135; // Initial y-position of the ball
 
-        // Начальные значения для гироскопа
-        let tiltX = 0;
-        let tiltY = 0;
-
-        // Функция для рисования квадрата
-        function drawSquare() {
-            ctx.beginPath();
-            ctx.rect((canvas.width - squareSize) / 2, (canvas.height - squareSize) / 2, squareSize, squareSize);
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.closePath();
-        }
-
-        // Функция для рисования мячика
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "#FF5733";
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        // Функция для движения мячика с использованием гироскопа
-        function moveBall() {
-            ballX += tiltX * ballSpeed;
-            ballY -= tiltY * ballSpeed; // Наклон вдоль оси Y
-
-            // Ограничиваем движение мячика в пределах квадрата
-            const squareLeft = (canvas.width - squareSize) / 2;
-            const squareTop = (canvas.height - squareSize) / 2;
-
-            if (ballX - ballRadius < squareLeft) {
-                ballX = squareLeft + ballRadius;
-            } else if (ballX + ballRadius > squareLeft + squareSize) {
-                ballX = squareLeft + squareSize - ballRadius;
-            }
-
-            if (ballY - ballRadius < squareTop) {
-                ballY = squareTop + ballRadius;
-            } else if (ballY + ballRadius > squareTop + squareSize) {
-                ballY = squareTop + squareSize - ballRadius;
-            }
-        }
-
-        // Обработчик для данных гироскопа
-        function handleGyroscope(event) {
-            tiltX = event.gamma / 30; // Разделим для корректировки чувствительности
-            tiltY = event.beta / 30; // Разделим для корректировки чувствительности
-        }
-
-        // Слушаем события гироскопа
-        window.addEventListener('deviceorientation', handleGyroscope, false);
-
-        // Главная функция для рисования и обновления экрана
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем экран
-            drawSquare(); // Рисуем квадрат
-            drawBall(); // Рисуем мячик
-            moveBall(); // Двигаем мячик
-            requestAnimationFrame(draw); // Рисуем снова
-        }
-
-
-       // Check if the browser supports Device Motion and Orientation events
-if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceOrientationEvent !== 'undefined') {
-  // Check if the device is running on iOS 13+ where permissions are needed
-  if (typeof DeviceMotionEvent.requestPermission === 'function') {
-    // Request permission to access device motion and orientation
-    DeviceMotionEvent.requestPermission()
-      .then(response => {
-        if (response === 'granted') {
-          // Permission granted, add event listeners for device motion and orientation
-          window.addEventListener('devicemotion', event => {
-            console.log("Device Motion detected:", event);
-          });
-
-          window.addEventListener('deviceorientation', event => {
-            console.log("Device Orientation detected:", event);
-          });
-        } else {
-          alert('Permission denied for accessing motion sensors.');
-        }
-      })
-      .catch(console.error);
-  } else {
-    // For older iOS versions or devices that do not require permission
-    window.addEventListener('devicemotion', event => {
-      console.log("Device Motion detected:", event);
-    });
-
-    window.addEventListener('deviceorientation', event => {
-      console.log("Device Orientation detected:", event);
-    });
-  }
-} else {
-  alert('Device motion and orientation are not supported on this device.');
-}
-
-
-        draw();
-    </script>
-</body>
-</html>
+        // Function to move 
