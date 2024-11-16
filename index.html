@@ -27,7 +27,7 @@
     text-align: center;
     width: 100%;
 }
- 
+
 #startButton {
     padding: 10px 20px;
     font-size: 16px;
@@ -39,11 +39,11 @@
     box-shadow: 0 4px #87ceeb;
     transition: background-color 0.3s, transform 0.3s;
 }
- 
+
 #startButton:hover {
     background-color: #87ceeb;
 }
- 
+
 #startButton:active {
     transform: translateY(2px);
     box-shadow: 0 2px #87ceeb;
@@ -56,21 +56,21 @@
 </div>
     
     <canvas id="gameCanvas" width="500" height="500"></canvas>
- 
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
- 
+
         const ballRadius = 20;
         const squareSize = 400;
         let ballX = squareSize / 2;
         let ballY = squareSize / 2;
         let ballSpeed = 4;
- 
+
         // Начальные значения для гироскопа
         let tiltX = 0;
         let tiltY = 0;
- 
+
         // Функция для рисования квадрата
         function drawSquare() {
             ctx.beginPath();
@@ -80,7 +80,7 @@
             ctx.stroke();
             ctx.closePath();
         }
- 
+
         // Функция для рисования мячика
         function drawBall() {
             ctx.beginPath();
@@ -89,38 +89,38 @@
             ctx.fill();
             ctx.closePath();
         }
- 
+
         // Функция для движения мячика с использованием гироскопа
         function moveBall() {
             ballX += tiltX * ballSpeed;
             ballY -= tiltY * ballSpeed; // Наклон вдоль оси Y
- 
+
             // Ограничиваем движение мячика в пределах квадрата
             const squareLeft = (canvas.width - squareSize) / 2;
             const squareTop = (canvas.height - squareSize) / 2;
- 
+
             if (ballX - ballRadius < squareLeft) {
                 ballX = squareLeft + ballRadius;
             } else if (ballX + ballRadius > squareLeft + squareSize) {
                 ballX = squareLeft + squareSize - ballRadius;
             }
- 
+
             if (ballY - ballRadius < squareTop) {
                 ballY = squareTop + ballRadius;
             } else if (ballY + ballRadius > squareTop + squareSize) {
                 ballY = squareTop + squareSize - ballRadius;
             }
         }
- 
+
         // Обработчик для данных гироскопа
         function handleGyroscope(event) {
             tiltX = event.gamma / 30; // Разделим для корректировки чувствительности
             tiltY = -event.beta / 30; // Разделим для корректировки чувствительности
         }
- 
+
         // Слушаем события гироскопа
         window.addEventListener('deviceorientation', handleGyroscope, false);
- 
+
         document.getElementById('startButton').addEventListener('click', () => {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
@@ -136,7 +136,7 @@
         window.addEventListener('deviceorientation', handleGyroscope, false);
     }
 });
- 
+
         
 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             DeviceOrientationEvent.requestPermission()
@@ -152,7 +152,7 @@ if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEve
             // Для устройств, которые не требуют разрешения
             window.addEventListener('deviceorientation', handleGyroscope, false);
         }
- 
+
         
         // Главная функция для рисования и обновления экрана
         function draw() {
@@ -162,7 +162,7 @@ if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEve
             moveBall(); // Двигаем мячик
             requestAnimationFrame(draw); // Рисуем снова
         }
- 
+
         draw();
     </script>
 </body>
