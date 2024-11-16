@@ -61,11 +61,20 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        const ballRadius = 20;
-        const squareSize = 400;
-        let ballX = squareSize / 2;
-        let ballY = squareSize / 2;
-        let ballSpeed = 4;
+       const ballRadius = 20;
+        const ballSpeed = 4;
+        let ballX = 40, ballY = 40;
+        let tiltX = 0, tiltY = 0;
+
+        // Maze walls
+        const walls = [
+            {x: 0, y: 0, width: 500, height: 20},  // Top wall
+            {x: 0, y: 0, width: 20, height: 500},  // Left wall
+            {x: 480, y: 0, width: 20, height: 500}, // Right wall
+            {x: 0, y: 480, width: 500, height: 20}, // Bottom wall
+            {x: 100, y: 100, width: 20, height: 300}, // Vertical wall
+            {x: 100, y: 100, width: 300, height: 20}, // Horizontal wall
+        ];
 
         // Начальные значения для гироскопа
         let tiltX = 0;
@@ -81,6 +90,14 @@
             ctx.closePath();
         }
 
+         // Draw the maze walls
+        function drawWalls() {
+            ctx.fillStyle = "#000";
+            walls.forEach(wall => {
+                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+            });
+        }
+        
         // Функция для рисования мячика
         function drawBall() {
             ctx.beginPath();
@@ -92,24 +109,30 @@
 
         // Функция для движения мячика с использованием гироскопа
         function moveBall() {
-            ballX += tiltX * ballSpeed;
-            ballY -= tiltY * ballSpeed; // Наклон вдоль оси Y
+            let newBallX = ballX + tiltX * ballSpeed;
+            let newBallY = ballY - tiltY * ballSpeed;
 
-            // Ограничиваем движение мячика в пределах квадрата
-            const squareLeft = (canvas.width - squareSize) / 2;
-            const squareTop = (canvas.height - squareSize) / 2;
-
-            if (ballX - ballRadius < squareLeft) {
-                ballX = squareLeft + ballRadius;
-            } else if (ballX + ballRadius > squareLeft + squareSize) {
-                ballX = squareLeft + squareSize - ballRadius;
+            // Check for collisions
+            for (let wall of walls) {
+                if (
+                    newBallX + ballRadius > wall.x &&
+                    newBallX - ballRadius < wall.x + wall.width &&
+                    newBallY + ballRadius > wall.y &&
+                    newBallY - ballRadius < wall.y + wall.height
+                ) {
+                    return; // Don't move the ball if there's a collision
+                }
             }
 
-            if (ballY - ballRadius < squareTop) {
-                ballY = squareTop + ballRadius;
-            } else if (ballY + ballRadius > squareTop + squareSize) {
-                ballY = squareTop + squareSize - ballRadius;
-            }
+            ballX = newBallX;
+            ballY = newBallY;
+        }
+function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            drawWalls(); // Draw walls
+            drawBall(); // Draw ball
+            moveBall(); // Move ball
+            requestAnimationFrame(draw); // Keep drawing
         }
 
         // Обработчик для данных гироскопа
