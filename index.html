@@ -7,7 +7,7 @@
     <style>
         body {
             display: flex;
-    flex-direction: column;
+            flex-direction: column;
             margin: 0;
             padding: 0;
             background-color: #f0f0f0;
@@ -23,38 +23,37 @@
             border: 2px solid #333;
         }
         #buttonContainer {
-    margin: 0 auto;
-    text-align: center;
-    width: 100%;
-}
+            margin: 0 auto;
+            text-align: center;
+            width: 100%;
+        }
 
-#startButton {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #FF5733;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 0 4px #87ceeb;
-    transition: background-color 0.3s, transform 0.3s;
-}
+        #startButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FF5733;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px #87ceeb;
+            transition: background-color 0.3s, transform 0.3s;
+        }
 
-#startButton:hover {
-    background-color: #87ceeb;
-}
+        #startButton:hover {
+            background-color: #87ceeb;
+        }
 
-#startButton:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px #87ceeb;
-}
+        #startButton:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px #87ceeb;
+        }
     </style>
 </head>
 <body>
     <div id="buttonContainer">
-    <button id="startButton">Start Game</button>
-</div>
-    
+        <button id="startButton">Start Game</button>
+    </div>
     <canvas id="gameCanvas" width="500" height="500"></canvas>
 
     <script>
@@ -67,9 +66,15 @@
         let ballY = squareSize / 2;
         let ballSpeed = 4;
 
-        // Начальные значения для гироскопа
         let tiltX = 0;
         let tiltY = 0;
+
+        // Колонны
+        const columns = [
+            { x: 100, y: 100, width: 50, height: 200 },
+            { x: 250, y: 50, width: 50, height: 250 },
+            { x: 350, y: 150, width: 50, height: 150 }
+        ];
 
         // Функция для рисования квадрата
         function drawSquare() {
@@ -90,10 +95,18 @@
             ctx.closePath();
         }
 
+        // Функция для рисования колонн
+        function drawColumns() {
+            ctx.fillStyle = "#8B0000"; // Цвет колонн
+            columns.forEach(col => {
+                ctx.fillRect(col.x, col.y, col.width, col.height);
+            });
+        }
+
         // Функция для движения мячика с использованием гироскопа
         function moveBall() {
             ballX += tiltX * ballSpeed;
-            ballY -= tiltY * ballSpeed; // Наклон вдоль оси Y
+            ballY -= tiltY * ballSpeed;
 
             // Ограничиваем движение мячика в пределах квадрата
             const squareLeft = (canvas.width - squareSize) / 2;
@@ -110,6 +123,15 @@
             } else if (ballY + ballRadius > squareTop + squareSize) {
                 ballY = squareTop + squareSize - ballRadius;
             }
+
+            // Проверка на столкновение с колоннами
+            columns.forEach(col => {
+                if (ballX + ballRadius > col.x && ballX - ballRadius < col.x + col.width &&
+                    ballY + ballRadius > col.y && ballY - ballRadius < col.y + col.height) {
+                    // Если столкновение, сбиваем мячик (например, останавливаем движение)
+                    ballX = col.x - ballRadius; // Останавливаем мячик у колонны
+                }
+            });
         }
 
         // Обработчик для данных гироскопа
@@ -122,42 +144,26 @@
         window.addEventListener('deviceorientation', handleGyroscope, false);
 
         document.getElementById('startButton').addEventListener('click', () => {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-            .then(response => {
-                if (response === 'granted') {
-                    window.addEventListener('deviceorientation', handleGyroscope, false);
-                } else {
-                    alert('Permission denied for accessing motion sensors.');
-                }
-            })
-            .catch(console.error);
-    } else {
-        window.addEventListener('deviceorientation', handleGyroscope, false);
-    }
-});
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleGyroscope, false);
+                        } else {
+                            alert('Permission denied for accessing motion sensors.');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleGyroscope, false);
+            }
+        });
 
-        
-if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission()
-                .then(response => {
-                    if (response === 'granted') {
-                        window.addEventListener('deviceorientation', handleGyroscope, false);
-                    } else {
-                        alert('Permission denied for accessing motion sensors.');
-                    }
-                })
-                .catch(console.error);
-        } else {
-            // Для устройств, которые не требуют разрешения
-            window.addEventListener('deviceorientation', handleGyroscope, false);
-        }
-
-        
         // Главная функция для рисования и обновления экрана
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем экран
             drawSquare(); // Рисуем квадрат
+            drawColumns(); // Рисуем колонны
             drawBall(); // Рисуем мячик
             moveBall(); // Двигаем мячик
             requestAnimationFrame(draw); // Рисуем снова
